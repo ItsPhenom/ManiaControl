@@ -64,7 +64,13 @@ class DedimaniaWebHandler implements TimerListener {
 			}
 
 			$methodResponse = $data[0];
-			if (xmlrpc_is_fault($methodResponse)) {
+
+			if (!is_array($methodResponse)) {
+				Logger::logError("Received invalid method response.");
+				return;
+			}
+
+			if (is_array($methodResponse) && xmlrpc_is_fault($methodResponse)) {
 				$this->handleXmlRpcFault($methodResponse, self::DEDIMANIA_OPEN_SESSION);
 				return;
 			}
@@ -85,7 +91,7 @@ class DedimaniaWebHandler implements TimerListener {
 
 		$asyncHttpRequest->setContent($content);
 		$asyncHttpRequest->setCompression(true);
-		$asyncHttpRequest->setTimeout(500);
+		$asyncHttpRequest->setTimeout(2000);
 		$asyncHttpRequest->postData();
 	}
 
@@ -478,7 +484,8 @@ class DedimaniaWebHandler implements TimerListener {
 			return null;
 		}
 		switch ($gameMode) {
-			case 0: {
+			case 0:
+			{
 				$scriptNameResponse = $this->maniaControl->getClient()->getScriptName();
 				$scriptName         = str_replace('.Script.txt', '', $scriptNameResponse['CurrentValue']);
 				switch ($scriptName) {
@@ -497,11 +504,13 @@ class DedimaniaWebHandler implements TimerListener {
 			}
 			case 1:
 			case 3:
-			case 5: {
+			case 5:
+			{
 				return 'Rounds';
 			}
 			case 2:
-			case 4: {
+			case 4:
+			{
 				return 'TA';
 			}
 		}
