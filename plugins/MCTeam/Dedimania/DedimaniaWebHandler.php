@@ -60,13 +60,14 @@ class DedimaniaWebHandler implements TimerListener {
 
 			$data = $this->decode($data);
 			if (!is_array($data) || empty($data)) {
+				Logger::logError("Data is empty.");
 				return;
 			}
 
 			$methodResponse = $data[0];
 
 			if (!is_array($methodResponse)) {
-				Logger::logError("Received invalid method response.");
+				Logger::logError("Received invalid method response, expected array.");
 				return;
 			}
 
